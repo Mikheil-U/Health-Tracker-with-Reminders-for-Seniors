@@ -1,35 +1,5 @@
 import sqlite3
-
-# This list is used to create a doctor table, the list will be passed as an argument to create_table()
-DOCTOR_COLUMNS = [
-    "doctor_id INTEGER PRIMARY KEY",
-    "first_name TEXT NOT NULL",
-    "last_name TEXT NOT NULL",
-    "email TEXT",
-    "phone_no TEXT",
-
-]
-# This list is used to create a patient table, the list will be passed as an argument to create_table()
-PATIENT_COLUMNS = [
-    "patient_id INTEGER PRIMARY KEY",
-    "first_name TEXT NOT NULL",
-    "last_name TEXT NOT NULL",
-    "dob TEXT NOT NULL",
-    "email TEXT",
-    "phone_no TEXT",
-    "assigned_doctor TEXT",
-    "FOREIGN KEY(assigned_doctor) REFERENCES Doctor(doctor_id)"
-]
-# This list is used to create an appointment table, the list will be passed as an argument to create_table()
-APPOINTMENT_COLUMNS = [
-    "id INTEGER PRIMARY KEY",
-    "description TEXT"
-    "app_date TEXT",
-    "doctor_id INT",
-    "patient_id INT",
-    "FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id)",
-    "FOREIGN KEY(patient_id) REFERENCES Patient(patient_id)"
-]
+from db_columns import DatabaseColumns
 
 
 class Database:
@@ -114,7 +84,13 @@ class Database:
         except sqlite3.Error as err:
             print(f"Error fetching data from table {table_name}")
 
-    def get_patient_email(self):
+    def get_patient_email(self, first_name: str, last_name: str):
+        pass
+
+    def get_doctor_info(self, first_name: str, last_name: str):
+        pass
+
+    def get_patient_appointment(self, patient_f_name: str, patient_l_name: str):
         pass
 
 
@@ -126,3 +102,5 @@ my_db = Database()
 #     my_db.insert_into_patient_table('Jessica', 'Doe', '01-27-1997', 'jessicadoe@yahoo.com', '214-123-4344', 'Dr. Nick'))
 # print(my_db.insert_into_doctor_table('Nick', 'Wazowski', 'wazovskinick@gmail.com', '123-456-4343'))
 my_db.read_table_data('Patient')
+db_cols = DatabaseColumns()
+print(my_db.create_table('Patient', db_cols.get_patient_columns()))
