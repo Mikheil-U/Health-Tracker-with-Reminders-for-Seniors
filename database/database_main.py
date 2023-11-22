@@ -97,6 +97,26 @@ class Database:
         except sqlite3.Error as err:
             return f"Error inserting data into Appointment table: {err}"
 
+    def read_table_data(self, table_name: str):
+        """
+            Prints the entire data for the given table
+        :param table_name: The name of a table
+        :return:
+        """
+        query = f'''
+            SELECT * FROM {table_name}
+        '''
+        try:
+            self.__cursor.execute(query)
+            rows = self.__cursor.fetchall()
+            for row in rows:
+                print(row)
+        except sqlite3.Error as err:
+            print(f"Error fetching data from table {table_name}")
+
+    def get_patient_email(self):
+        pass
+
 
 my_db = Database()
 # print(my_db.create_table('Doctor', DOCTOR_COLUMNS))
@@ -104,4 +124,5 @@ my_db = Database()
 # print(my_db.create_table('Appointment', APPOINTMENT_COLUMNS))
 # print(
 #     my_db.insert_into_patient_table('Jessica', 'Doe', '01-27-1997', 'jessicadoe@yahoo.com', '214-123-4344', 'Dr. Nick'))
-print(my_db.insert_into_doctor_table('Nick', 'Wazowski', 'wazovskinick@gmail.com', '123-456-4343'))
+# print(my_db.insert_into_doctor_table('Nick', 'Wazowski', 'wazovskinick@gmail.com', '123-456-4343'))
+my_db.read_table_data('Patient')
