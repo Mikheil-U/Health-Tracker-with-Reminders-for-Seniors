@@ -93,14 +93,26 @@ class Database:
     def get_patient_appointment(self, patient_f_name: str, patient_l_name: str):
         pass
 
+    def get_patient_medications(self):
+        pass
+
+    def get_patient_health_history(self):
+        pass
+
 
 my_db = Database()
-# print(my_db.create_table('Doctor', DOCTOR_COLUMNS))
-# print(my_db.create_table('Patient', PATIENT_COLUMNS))
-# print(my_db.create_table('Appointment', APPOINTMENT_COLUMNS))
-# print(
-#     my_db.insert_into_patient_table('Jessica', 'Doe', '01-27-1997', 'jessicadoe@yahoo.com', '214-123-4344', 'Dr. Nick'))
-# print(my_db.insert_into_doctor_table('Nick', 'Wazowski', 'wazovskinick@gmail.com', '123-456-4343'))
-my_db.read_table_data('Patient')
 db_cols = DatabaseColumns()
-print(my_db.create_table('Patient', db_cols.get_patient_columns()))
+
+
+def create_tables():
+    """A helper function to initialize Database and create all tables"""
+    print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
+    print(my_db.create_table('Patient', db_cols.get_patient_columns()))
+    print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
+    print(my_db.create_table('Medications', db_cols.get_medications_columns()))
+    print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
+
+
+if __name__ == '__main__':
+    create_tables()
+    my_db.read_table_data('Patient')

@@ -17,7 +17,6 @@ class DatabaseColumns:
             "last_name TEXT NOT NULL",
             "email TEXT",
             "phone_no TEXT",
-
         ]
         return self.doctor_col
 
@@ -47,3 +46,28 @@ class DatabaseColumns:
             "FOREIGN KEY(patient_id) REFERENCES Patient(patient_id)"
         ]
         return self.appointment_col
+
+    def get_medications_columns(self) -> list[str]:
+        self.medications_col = [
+            "id INTEGER PRIMARY KEY",
+            "patient_id INT",
+            "doctor_id INT",
+            "prescription_date TEXT",
+            "prescribed_meds TEXT",
+            "FOREIGN KEY(patient_id) REFERENCES Patient(patient_id)",
+            "FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id)"
+        ]
+        return self.medications_col
+
+    def get_health_info_columns(self) -> list[str]:
+        self.health_info_col = [
+            "id INTEGER PRIMARY KEY",
+            "patient_id INTEGER",
+            "history TEXT"
+        ]
+        return self.health_info_col
+
+
+
+
+
