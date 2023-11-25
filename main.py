@@ -5,6 +5,20 @@ from tkinter import messagebox
 from tksheet import Sheet
 from database.database_main import Database
 from database.db_columns import *
+import threading
+import reminders
+
+# Stop events
+appointments_stop_event = threading.Event()
+medications_stop_event = threading.Event()
+
+# Create a thread for checking appointments
+appointments_thread = threading.Thread(target=reminders.check_appointments, args=(appointments_stop_event,))
+# Create a thread for checking medications
+medications_thread = threading.Thread(target=reminders.check_medications, args=(medications_stop_event,))
+appointments_thread.start()
+medications_thread.start()
+
 
 db_cols = DatabaseColumns()
 my_db = Database()
@@ -24,9 +38,14 @@ my_db.read_table_data('Patient')
 root = tk.Tk()
 root.withdraw()
 
+# If the user closes the program window, the program execution stops
+def on_window_close():
+    root.destroy()
+
 # Function to handle login window
 def login_window():
     login_window = tk.Toplevel(root)
+    login_window.protocol("WM_DELETE_WINDOW", on_window_close)
     login_window.title("Log In")
     login_window.geometry("800x500")
 
@@ -97,6 +116,7 @@ def signup_window():
 # Function to handle the main window
 def main_window():
     main_window = tk.Toplevel(root)
+    main_window.protocol("WM_DELETE_WINDOW", on_window_close)
     main_window.title("Health Tracker")
     main_window.geometry("800x500")
 
@@ -179,3 +199,10 @@ def create_appointments_page(frame):
 login_window()
 
 root.mainloop()
+
+# To stop the threads
+appointments_stop_event.set()
+medications_stop_event.set()
+
+appointments_thread.join()
+medications_thread.join()
