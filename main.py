@@ -3,6 +3,23 @@ from tkinter import ttk
 from tkinter import *
 from tkinter import messagebox
 from tksheet import Sheet
+from database.database_main import Database
+from database.db_columns import *
+
+db_cols = DatabaseColumns()
+my_db = Database()
+
+
+
+"""A helper function to initialize Database and create all tables"""
+# print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
+# print(my_db.create_table('Patient', db_cols.get_patient_columns()))
+# print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
+# print(my_db.create_table('Medications', db_cols.get_medications_columns()))
+# print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
+
+my_db.read_table_data('Patient')
+
 
 # Function to handle login window
 def login_window():
@@ -22,7 +39,9 @@ def login_window():
 
         # TODO - login
         # Check if the username and password match
-        if username == "user" and password == "hey":
+        get_login_details = my_db.authenticate(username, password)
+        print(get_login_details)
+        if username in get_login_details and password in get_login_details:
             login_window.destroy()
             main_window()
             return
@@ -58,9 +77,8 @@ def signup_window():
         # TODO - update the fields according to login requirements
         username = username_var.get()
         password = password_var.get()
-
         # TODO - Store user information
-
+        my_db.register_user(username, password)
         # Close sign-up window
         signup_window.destroy()
 
@@ -110,6 +128,7 @@ def create_health_page(frame):
     label.pack(pady=10)
 
     # TODO - Add health information of the user and other stuff
+
 
 def create_medications_page(frame):
     # Add widgets for medications page

@@ -24,9 +24,11 @@ class DatabaseColumns:
         # This list is used to create a patient table, the list will be passed as an argument to create_table()
         self.patient_col = [
             "patient_id INTEGER PRIMARY KEY",
-            "first_name TEXT NOT NULL",
-            "last_name TEXT NOT NULL",
-            "dob TEXT NOT NULL",
+            "first_name TEXT",
+            "last_name TEXT",
+            "user_name TEXT",
+            "password TEXT",
+            "dob TEXT",
             "email TEXT",
             "phone_no TEXT",
             "assigned_doctor TEXT",

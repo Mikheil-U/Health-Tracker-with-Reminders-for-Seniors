@@ -1,5 +1,5 @@
 import sqlite3
-from db_columns import DatabaseColumns
+from database.db_columns import DatabaseColumns
 
 
 class Database:
@@ -99,20 +99,45 @@ class Database:
     def get_patient_health_history(self):
         pass
 
+    def register_user(self, username: str, password: str):
+        query = "INSERT INTO Patient(user_name, password) VALUES (?, ?)"
+        values = (username, password)
+        try:
+            self.__cursor.execute(query, values)
+            self.__sql_connection.commit()
+            return f"You have successfully registered!"
+        except sqlite3.Error as err:
+            return f"Error creating an account: {err}"
 
-my_db = Database()
-db_cols = DatabaseColumns()
+    def authenticate(self, username: str, password: str) -> list[str]:
+        """This function will check whether the user with the given username and password exist in a database"""
+        query = "SELECT * FROM Patient WHERE user_name = ? AND password = ?"
+        try:
+            self.__cursor.execute(query, (username, password))
+            # get one record
+            result = self.__cursor.fetchone()
+            # check if any record was found
+            if result:
+                return result[3:5]
+        except sqlite3.Error as err:
+            return ['Error occurred', err]
 
 
-def create_tables():
-    """A helper function to initialize Database and create all tables"""
-    print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
-    print(my_db.create_table('Patient', db_cols.get_patient_columns()))
-    print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
-    print(my_db.create_table('Medications', db_cols.get_medications_columns()))
-    print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
+# db_cols = DatabaseColumns()
+# my_db = Database()
 
 
-if __name__ == '__main__':
-    create_tables()
-    my_db.read_table_data('Patient')
+# def create_tables():
+#     """A helper function to initialize Database and create all tables"""
+#     print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
+#     print(my_db.create_table('Patient', db_cols.get_patient_columns()))
+#     print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
+#     print(my_db.create_table('Medications', db_cols.get_medications_columns()))
+#     print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
+#     pass
+#
+# if __name__ == '__main__':
+#     create_tables()
+#     # my_db.read_table_data('Patient')
+#     # my_db.register_user('misho', '12345678')
+#     print(my_db.authenticate('misho', '12345678'))
