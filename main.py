@@ -20,10 +20,13 @@ my_db = Database()
 
 my_db.read_table_data('Patient')
 
+# main application window - hidden
+root = tk.Tk()
+root.withdraw()
 
 # Function to handle login window
 def login_window():
-    login_window = tk.Tk()
+    login_window = tk.Toplevel(root)
     login_window.title("Log In")
     login_window.geometry("800x500")
 
@@ -64,8 +67,7 @@ def login_window():
 
 # Function to handle sign-up window
 def signup_window():
-    # signup_window = tk.Toplevel(root)
-    signup_window = tk.Tk()
+    signup_window = tk.Toplevel(root)
     signup_window.title("Sign Up")
 
     # Variables to store user input
@@ -94,8 +96,7 @@ def signup_window():
 
 # Function to handle the main window
 def main_window():
-    # main_window = tk.Toplevel(root)
-    main_window = tk.Tk()
+    main_window = tk.Toplevel(root)
     main_window.title("Health Tracker")
     main_window.geometry("800x500")
 
@@ -176,3 +177,5 @@ def create_appointments_page(frame):
 
 # Open the login window to start the program
 login_window()
+
+root.mainloop()
