@@ -135,6 +135,18 @@ class Database:
         except sqlite3.Error as err:
             return f"An error occurred: {err}"
 
+    def create_appointment(self, patient_first_name: str, patient_last_name: str,
+                           app_date: str, app_time: str, doctor_f_name: str, doctor_l_name: str):
+        query = f"""
+            INSERT INTO Appointment(app_date, app_time, patient_first_name, patient_last_name, doctor_first_name, doctor_last_name)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """
+        try:
+            self.__cursor.execute(query, (app_date, app_time, patient_first_name, patient_last_name, doctor_f_name, doctor_l_name))
+            self.__sql_connection.commit()
+        except sqlite3.Error as err:
+            return f"Error creating appointment: {err}"
+
     def get_patient_email(self, first_name: str, last_name: str):
         query = f"""
             SELECT email FROM Patient
@@ -179,26 +191,17 @@ class Database:
     def get_patient_appointment(self, patient_first_name: str, patient_last_name: str):
         # Get the patient's ID from the Patient table
         query = f"""
-                        SELECT patient_id FROM Patient
-                        WHERE first_name = ? AND last_name = ?
+                        SELECT * FROM Appointment
+                        WHERE patient_first_name = ? AND patient_last_name = ?
                     """
         try:
             self.__cursor.execute(query, (patient_first_name, patient_last_name))
             result = self.__cursor.fetchone()
 
             if result:
-                patient_id = result[0]
-                # Get the patient's data from the Appointment table
-                app_id = "SELECT * FROM Appointment WHERE patient_id =?"
-                self.__cursor.execute(app_id, (patient_id,))
-                app_data = self.__cursor.fetchone()
-
-                if app_data:
-                    return app_data
-                else:
-                    return f"Appointment not found"
+                return result[2:]
             else:
-                return "Patient not found"
+                return f"Patient was not found!"
         except sqlite3.Error as err:
             return f"An error occurred finding patient's appointment data: {err}"
 
@@ -260,7 +263,9 @@ def create_tables():
     print(my_db.create_table('Medications', db_cols.get_medications_columns()))
     print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
 
-create_tables()
+# create_tables()
 # print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
 # print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
-print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
+# print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
+# my_db.create_appointment('mike', 'smith', '11/29/2023', '4:30pm', 'Jessica', "Doe")
+# print(my_db.get_patient_appointment('mike', 'smith'))

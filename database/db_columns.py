@@ -42,10 +42,10 @@ class DatabaseColumns:
             "description TEXT",
             "app_date TEXT",
             "app_time TEXT",
-            "doctor_id INT",
-            "patient_id INT",
-            "FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id)",
-            "FOREIGN KEY(patient_id) REFERENCES Patient(patient_id)"
+            "patient_first_name TEXT",
+            "patient_last_name TEXT",
+            "doctor_first_name TEXT",
+            "doctor_last_name TEXT",
         ]
         return self.appointment_col
 
