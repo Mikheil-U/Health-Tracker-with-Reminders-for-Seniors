@@ -52,12 +52,10 @@ class DatabaseColumns:
     def get_medications_columns(self) -> list[str]:
         self.medications_col = [
             "id INTEGER PRIMARY KEY",
-            "patient_id INT",
-            "doctor_id INT",
+            "first_name TEXT",
+            "last_name TEXT",
             "prescription_date TEXT",
             "prescribed_meds TEXT",
-            "FOREIGN KEY(patient_id) REFERENCES Patient(patient_id)",
-            "FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id)"
         ]
         return self.medications_col
 
