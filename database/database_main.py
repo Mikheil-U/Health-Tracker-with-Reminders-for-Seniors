@@ -25,13 +25,13 @@ class Database:
         except sqlite3.Error as err:
             return f"Error creating table: {table_name}: {err}"
 
-    def insert_into_patient_table(self, first_name: str, last_name: str, dob: str,
-                                  email: str, phone_no: str, assigned_doctor: str):
+    def insert_into_patient_table(self, first_name: str, last_name: str,
+                                  email: str, phone_no: str):
         query = '''
-                INSERT INTO Patient(first_name, last_name, dob, email, phone_no, assigned_doctor)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO Patient(first_name, last_name, email, phone_no)
+                VALUES (?, ?, ?, ?)
             '''
-        values = (first_name, last_name, dob, email, phone_no, assigned_doctor)
+        values = (first_name, last_name, email, phone_no)
         try:
             self.__cursor.execute(query, values)
             self.__sql_connection.commit()
@@ -89,7 +89,7 @@ class Database:
             During sign up we only ask for username and password
         """
         query = """
-            UPDATE PATIENT
+            UPDATE Patient
             SET first_name = ?, last_name = ?, dob = ?, email = ?
             WHERE user_name = ?
         """
@@ -104,6 +104,36 @@ class Database:
                 return f"No such username: {current_username}"
         except sqlite3.Error as err:
             return f"An error occurred while updating patient's data: {err}"
+
+    def assign_doctor(self, patient_first_name: str, patient_last_name: str,
+                      doctor_first_name: str, doctor_last_name: str):
+        """This function assigns doctor to a current patient.
+            If doctor is found in Doctor table it's id will be saved in Patient's table in assigned_doctor_id as FK.
+        """
+        query = f"""SELECT doctor_id FROM Doctor 
+            WHERE first_name = ? AND last_name = ?
+            """
+        try:
+            self.__cursor.execute(query, (doctor_first_name, doctor_last_name))
+            result = self.__cursor.fetchone()
+
+            if result:
+                doc_id = result[0]
+                assign_query = f"""
+                                UPDATE Patient SET assigned_doctor_id = ? 
+                                WHERE first_name = ? AND last_name = ?"""
+                self.__cursor.execute(assign_query, (doc_id, patient_first_name, patient_last_name))
+                # save the changes
+                self.__sql_connection.commit()
+                if self.__cursor.rowcount > 0:
+                    return "Doctor assigned to patient successfully."
+                else:
+                    return "No patient found with the given first name and last name."
+            else:
+                return f"Doctor with the given first name and last name couldn't be found"
+
+        except sqlite3.Error as err:
+            return f"An error occurred: {err}"
 
     def get_patient_email(self, first_name: str, last_name: str):
         query = f"""
@@ -146,8 +176,31 @@ class Database:
         except sqlite3.Error as err:
             return f"An error occurred finding doctor's data: {err}"
 
-    def get_patient_appointment(self, patient_f_name: str, patient_l_name: str):
-        pass
+    def get_patient_appointment(self, patient_first_name: str, patient_last_name: str):
+        # Get the patient's ID from the Patient table
+        query = f"""
+                        SELECT patient_id FROM Patient
+                        WHERE first_name = ? AND last_name = ?
+                    """
+        try:
+            self.__cursor.execute(query, (patient_first_name, patient_last_name))
+            result = self.__cursor.fetchone()
+
+            if result:
+                patient_id = result[0]
+                # Get the patient's data from the Appointment table
+                app_id = "SELECT * FROM Appointment WHERE patient_id =?"
+                self.__cursor.execute(app_id, (patient_id,))
+                app_data = self.__cursor.fetchone()
+
+                if app_data:
+                    return app_data
+                else:
+                    return f"Appointment not found"
+            else:
+                return "Patient not found"
+        except sqlite3.Error as err:
+            return f"An error occurred finding patient's appointment data: {err}"
 
     def get_patient_medications(self):
         pass
@@ -199,17 +252,15 @@ db_cols = DatabaseColumns()
 my_db = Database()
 
 
-# def create_tables():
-#     """A helper function to initialize Database and create all tables"""
-#     # print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
-#     print(my_db.create_table('Patient', db_cols.get_patient_columns()))
-#     # print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
-#     # print(my_db.create_table('Medications', db_cols.get_medications_columns()))
-#     # print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
-#     # pass
-#
-# if __name__ == '__main__':
-#     create_tables()
-#     my_db.read_table_data('Patient')
-#     # my_db.register_user('misho', '12345678')
+def create_tables():
+    """A helper function to initialize Database and create all tables"""
+    print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
+    print(my_db.create_table('Patient', db_cols.get_patient_columns()))
+    print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
+    print(my_db.create_table('Medications', db_cols.get_medications_columns()))
+    print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
 
+create_tables()
+# print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
+# print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
+print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
