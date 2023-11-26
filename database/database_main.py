@@ -67,6 +67,21 @@ class Database:
         except sqlite3.Error as err:
             return f"Error inserting data into Appointment table: {err}"
 
+    def insert_into_health_history(self, first_name: str, last_name: str, wight: str, height: str, age: str, dob: str):
+        query = f"""
+            INSERT INTO Health_History(first_name, last_name, weight, height, age, dob)
+            VALUES = (?, ?, ?, ?, ?, ?) 
+        """
+        try:
+            self.__cursor.execute(query, (first_name, last_name, wight, height, age, dob))
+            self.__sql_connection.commit()
+            return f"Data inserted into Health History table successfully!"
+        except sqlite3.Error as err:
+            return f"Error inserting data into Health History table: {err}"
+
+    def insert_into_medications(self):
+        pass
+
     def read_table_data(self, table_name: str):
         """
             Prints the entire data for the given table
@@ -208,8 +223,20 @@ class Database:
     def get_patient_medications(self):
         pass
 
-    def get_patient_health_history(self):
-        pass
+    def get_patient_health_history(self, first_name: str, last_name: str):
+        query = f"""
+                SELECT * FROM Health_History
+                WHERE first_name = ? AND last_name = ?
+            """
+        try:
+            self.__cursor.execute(query, (first_name, last_name))
+            result = self.__cursor.fetchone()
+            if result:
+                return result
+            else:
+                return f"No patient with the given first and last names"
+        except sqlite3.Error as err:
+            return f"Error fetching patient health history: {err}"
 
     def delete_patient_data(self, first_name: str, last_name: str):
         query = f"""
