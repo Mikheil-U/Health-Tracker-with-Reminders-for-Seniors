@@ -62,7 +62,7 @@ class DatabaseColumns:
     def get_health_info_columns(self) -> list[str]:
         self.health_info_col = [
             "first_name TEXT",
-            "last_name TEXT"
+            "last_name TEXT",
             "weight TEXT",
             "height TEXT",
             "age TEXT",

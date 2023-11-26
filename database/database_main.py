@@ -5,7 +5,7 @@ from database.db_columns import DatabaseColumns
 class Database:
 
     def __init__(self):
-        self.__sql_connection = sqlite3.connect('hospital.db')
+        self.__sql_connection = sqlite3.connect('../hospital.db')
         self.__cursor = self.__sql_connection.cursor()
 
     def create_table(self, table_name: str, columns: list[str]):
@@ -70,7 +70,7 @@ class Database:
     def insert_into_health_history(self, first_name: str, last_name: str, wight: str, height: str, age: str, dob: str):
         query = f"""
             INSERT INTO Health_History(first_name, last_name, weight, height, age, dob)
-            VALUES = (?, ?, ?, ?, ?, ?) 
+            VALUES (?, ?, ?, ?, ?, ?) 
         """
         try:
             self.__cursor.execute(query, (first_name, last_name, wight, height, age, dob))
@@ -79,8 +79,17 @@ class Database:
         except sqlite3.Error as err:
             return f"Error inserting data into Health History table: {err}"
 
-    def insert_into_medications(self):
-        pass
+    def insert_into_medications(self, first_name: str, last_name: str, prescription_date: str, prescribed_meds: str):
+        query = f"""
+                    INSERT INTO Medications(first_name, last_name, prescription_date, prescribed_meds)
+                    VALUES (?, ?, ?, ?) 
+                """
+        try:
+            self.__cursor.execute(query, (first_name, last_name, prescription_date, prescribed_meds))
+            self.__sql_connection.commit()
+            return f"Data inserted into Medications table successfully!"
+        except sqlite3.Error as err:
+            return f"Error inserting data into Medications table: {err}"
 
     def read_table_data(self, table_name: str):
         """
@@ -204,7 +213,7 @@ class Database:
             return f"An error occurred finding doctor's data: {err}"
 
     def get_patient_appointment(self, patient_first_name: str, patient_last_name: str):
-        # Get the patient's ID from the Patient table
+
         query = f"""
                         SELECT * FROM Appointment
                         WHERE patient_first_name = ? AND patient_last_name = ?
@@ -220,8 +229,21 @@ class Database:
         except sqlite3.Error as err:
             return f"An error occurred finding patient's appointment data: {err}"
 
-    def get_patient_medications(self):
-        pass
+    def get_patient_medications(self, first_name: str, last_name:str):
+        query = f"""
+                SELECT * FROM Medications
+                WHERE first_name = ? AND last_name = ?
+            """
+        try:
+            self.__cursor.execute(query, (first_name, last_name))
+            result = self.__cursor.fetchone()
+
+            if result:
+                return result
+            else:
+                return f"Patient was not found!"
+        except sqlite3.Error as err:
+            return f"An error occurred fetching patient's medications : {err}"
 
     def get_patient_health_history(self, first_name: str, last_name: str):
         query = f"""
@@ -290,9 +312,11 @@ def create_tables():
     print(my_db.create_table('Medications', db_cols.get_medications_columns()))
     print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
 
-# create_tables()
-# print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
-# print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
-# print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
-# my_db.create_appointment('mike', 'smith', '11/29/2023', '4:30pm', 'Jessica', "Doe")
-# print(my_db.get_patient_appointment('mike', 'smith'))
+create_tables()
+print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
+print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
+print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
+print(my_db.create_appointment('mike', 'smith', '11/29/2023', '4:30pm', 'Jessica', "Doe"))
+print(my_db.get_patient_appointment('mike', 'smith'))
+print(my_db.insert_into_medications('mike', 'smith', '11-26-2023', 'tylenol'))
+print(my_db.insert_into_health_history('mike', 'smith', '150lbs', "5'9", '25', '1998'))
