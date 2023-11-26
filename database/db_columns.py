@@ -28,11 +28,10 @@ class DatabaseColumns:
             "last_name TEXT",
             "user_name TEXT",
             "password TEXT",
-            "dob TEXT",
             "email TEXT",
             "phone_no TEXT",
-            "assigned_doctor TEXT",
-            "FOREIGN KEY(assigned_doctor) REFERENCES Doctor(doctor_id)"
+            "assigned_doctor_id TEXT",
+            "FOREIGN KEY(assigned_doctor_id) REFERENCES Doctor(doctor_id)"
         ]
         return self.patient_col
 
@@ -40,8 +39,9 @@ class DatabaseColumns:
         # This list is used to create an appointment table, the list will be passed as an argument to create_table()
         self.appointment_col = [
             "id INTEGER PRIMARY KEY",
-            "description TEXT"
+            "description TEXT",
             "app_date TEXT",
+            "app_time TEXT",
             "doctor_id INT",
             "patient_id INT",
             "FOREIGN KEY(doctor_id) REFERENCES Doctor(doctor_id)",
@@ -65,7 +65,10 @@ class DatabaseColumns:
         self.health_info_col = [
             "id INTEGER PRIMARY KEY",
             "patient_id INTEGER",
-            "history TEXT"
+            "weight TEXT",
+            "height TEXT",
+            "age TEXT",
+            "dob TEXT"
         ]
         return self.health_info_col
 

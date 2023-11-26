@@ -84,11 +84,67 @@ class Database:
         except sqlite3.Error as err:
             print(f"Error fetching data from table {table_name}")
 
-    def get_patient_email(self, first_name: str, last_name: str):
-        pass
+    def update_patient_data(self, current_username: str, first_name: str, last_name: str, dob: str, email: str):
+        """This function is used to update patient's data after creating their account.
+            During sign up we only ask for username and password
+        """
+        query = """
+            UPDATE PATIENT
+            SET first_name = ?, last_name = ?, dob = ?, email = ?
+            WHERE user_name = ?
+        """
+        try:
+            # execute the query
+            self.__cursor.execute(query, (first_name, last_name, dob, email, current_username))
+            # save the changes
+            self.__sql_connection.commit()
+            if self.__cursor.rowcount > 0:
+                return f"{current_username} information has been updated"
+            else:
+                return f"No such username: {current_username}"
+        except sqlite3.Error as err:
+            return f"An error occurred while updating patient's data: {err}"
 
-    def get_doctor_info(self, first_name: str, last_name: str):
-        pass
+    def get_patient_email(self, first_name: str, last_name: str):
+        query = f"""
+            SELECT email FROM Patient
+            WHERE first_name = ? AND last_name = ?
+        """
+        try:
+            self.__cursor.execute(query, (first_name, last_name))
+            email = self.__cursor.fetchone()
+            if email:
+                return email[0]
+            else:
+                return f"Patient with the given first name and last name couldn't be found"
+        except sqlite3.Error as err:
+            return f"An error occurred: {err}"
+
+    def get_doctor_info(self, patient_first_name: str, patient_last_name: str):
+        # Get the doctor's ID from the Patient table
+        query = f"""
+                SELECT doctor_id FROM Patient
+                WHERE first_name = ? AND last_name = ?
+            """
+        try:
+            self.__cursor.execute(query, (patient_first_name, patient_last_name))
+            result = self.__cursor.fetchone()
+
+            if result:
+                doctor_id = result[0]
+                # Get the doctor's data from the Doctror table
+                query_doc = "SELECT * FROM Doctor WHERE doctor_id =?"
+                self.__cursor.execute(query_doc, (doctor_id, ))
+                doctor_data = self.__cursor.fetchone()
+
+                if doctor_data:
+                    return doctor_data
+                else:
+                    return f"Doctor not found"
+            else:
+                return "Patient not found"
+        except sqlite3.Error as err:
+            return f"An error occurred finding doctor's data: {err}"
 
     def get_patient_appointment(self, patient_f_name: str, patient_l_name: str):
         pass
@@ -98,6 +154,22 @@ class Database:
 
     def get_patient_health_history(self):
         pass
+
+    def delete_patient_data(self, first_name: str, last_name: str):
+        query = f"""
+            DELETE FROM Patient WHERE first_name = ? AND last_name = ?
+        """
+        try:
+            self.__cursor.execute(query, (first_name, last_name))
+            # save the changes
+            self.__sql_connection.commit()
+
+            if self.__cursor.rowcount > 0:
+                return f"Patient data deleted successfully"
+            else:
+                return f"No patient found with the given first and last name."
+        except sqlite3.Error as err:
+            return f"Error deleting patient data: {err}"
 
     def register_user(self, username: str, password: str):
         query = "INSERT INTO Patient(user_name, password) VALUES (?, ?)"
@@ -123,21 +195,21 @@ class Database:
             return ['Error occurred', err]
 
 
-# db_cols = DatabaseColumns()
-# my_db = Database()
+db_cols = DatabaseColumns()
+my_db = Database()
 
 
 # def create_tables():
 #     """A helper function to initialize Database and create all tables"""
-#     print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
+#     # print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
 #     print(my_db.create_table('Patient', db_cols.get_patient_columns()))
-#     print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
-#     print(my_db.create_table('Medications', db_cols.get_medications_columns()))
-#     print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
-#     pass
+#     # print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
+#     # print(my_db.create_table('Medications', db_cols.get_medications_columns()))
+#     # print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
+#     # pass
 #
 # if __name__ == '__main__':
 #     create_tables()
-#     # my_db.read_table_data('Patient')
+#     my_db.read_table_data('Patient')
 #     # my_db.register_user('misho', '12345678')
-#     print(my_db.authenticate('misho', '12345678'))
+
