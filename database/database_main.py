@@ -260,9 +260,9 @@ class Database:
         except sqlite3.Error as err:
             return f"Error fetching patient health history: {err}"
 
-    def delete_patient_data(self, first_name: str, last_name: str):
+    def delete_medications_data(self, first_name: str, last_name: str):
         query = f"""
-            DELETE FROM Patient WHERE first_name = ? AND last_name = ?
+            DELETE FROM Medications WHERE first_name = ? AND last_name = ?
         """
         try:
             self.__cursor.execute(query, (first_name, last_name))
@@ -275,6 +275,22 @@ class Database:
                 return f"No patient found with the given first and last name."
         except sqlite3.Error as err:
             return f"Error deleting patient data: {err}"
+
+    def delete_appointment_data(self, patient_first_name: str, patient_last_name: str):
+        query = f"""
+                    DELETE FROM Appointment WHERE patient_first_name = ? AND patient_last_name = ?
+                """
+        try:
+            self.__cursor.execute(query, (patient_first_name, patient_last_name))
+            # save the changes
+            self.__sql_connection.commit()
+
+            if self.__cursor.rowcount > 0:
+                return f"Appointment data deleted successfully"
+            else:
+                return f"No patient found with the given first and last name."
+        except sqlite3.Error as err:
+            return f"Error deleting patient appointment data: {err}"
 
     def register_user(self, username: str, password: str):
         query = "INSERT INTO Patient(user_name, password) VALUES (?, ?)"
@@ -312,11 +328,46 @@ def create_tables():
     print(my_db.create_table('Medications', db_cols.get_medications_columns()))
     print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
 
-create_tables()
-print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
-print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
-print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
-print(my_db.create_appointment('mike', 'smith', '11/29/2023', '4:30pm', 'Jessica', "Doe"))
-print(my_db.get_patient_appointment('mike', 'smith'))
-print(my_db.insert_into_medications('mike', 'smith', '11-26-2023', 'tylenol'))
-print(my_db.insert_into_health_history('mike', 'smith', '150lbs', "5'9", '25', '1998'))
+
+def populate_database():
+    first_names = ["James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda", "William",
+                   "Elizabeth"]
+
+    last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez",
+                  "Martinez"]
+    doc_names = ['Jessica', 'Michael', 'Mary']
+    doc_lnames = ['Smith', 'Doe', 'Miller']
+
+    # populate Patient DB
+    for i in range(len(first_names)):
+        print(my_db.insert_into_patient_table(first_names[i], last_names[i],
+                                              f'email{i}yahoo.com', f'{i}25-4{i}1-414{i}'))
+
+    # populate Doctor DB
+    for i in range(3):
+        print(my_db.insert_into_doctor_table(doc_names[i], doc_lnames[i],
+                                             f'{doc_names[i]}{doc_lnames}@gmail.com', f'215-4{i}3-{i}52{i}'))
+
+    # Assign doctors to patients
+    for i in range(len(first_names)):
+        print(my_db.assign_doctor(first_names[i], last_names[i], doc_names[i], doc_lnames[i]))
+
+    # Create appointments
+    # for i in range(len(first_names)):
+    #     print(my_db.create_appointment(first_names[i], last_names[i], '12-12-2023', '{}'))
+
+
+
+# create_tables()
+# print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
+# print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
+# print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
+# print(my_db.create_appointment('mike', 'smith', '11/29/2023', '4:30pm', 'Jessica', "Doe"))
+# print(my_db.get_patient_appointment('mike', 'smith'))
+# print(my_db.insert_into_medications('mike', 'smith', '11-26-2023', 'tylenol'))
+# print(my_db.insert_into_health_history('mike', 'smith', '150lbs', "5'9", '25', '1998'))
+
+# populate_database()
+# my_db.read_table_data('Patient')
+# print(my_db.delete_medications_data('mike', 'smith'))
+# print(my_db.delete_appointment_data('mike', 'smith'))
