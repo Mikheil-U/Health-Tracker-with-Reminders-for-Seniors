@@ -5,7 +5,7 @@ from database.db_columns import DatabaseColumns
 class Database:
 
     def __init__(self):
-        self.__sql_connection = sqlite3.connect('../hospital.db')
+        self.__sql_connection = sqlite3.connect('hospital.db')
         self.__cursor = self.__sql_connection.cursor()
 
     def create_table(self, table_name: str, columns: list[str]):
@@ -108,18 +108,18 @@ class Database:
         except sqlite3.Error as err:
             print(f"Error fetching data from table {table_name}")
 
-    def update_patient_data(self, current_username: str, first_name: str, last_name: str, dob: str, email: str):
+    def update_patient_data(self, current_username: str, first_name: str, last_name: str, email: str):
         """This function is used to update patient's data after creating their account.
             During sign up we only ask for username and password
         """
         query = """
             UPDATE Patient
-            SET first_name = ?, last_name = ?, dob = ?, email = ?
+            SET first_name = ?, last_name = ?, email = ?
             WHERE user_name = ?
         """
         try:
             # execute the query
-            self.__cursor.execute(query, (first_name, last_name, dob, email, current_username))
+            self.__cursor.execute(query, (first_name, last_name, email, current_username))
             # save the changes
             self.__sql_connection.commit()
             if self.__cursor.rowcount > 0:
@@ -186,6 +186,21 @@ class Database:
         except sqlite3.Error as err:
             return f"An error occurred: {err}"
 
+    def get_patient_details(self, username: str, password: str):
+        query = f"""
+            SELECT email, first_name, last_name FROM Patient
+            WHERE user_name = ? AND password = ?
+        """
+        try:
+            self.__cursor.execute(query, (username, password))
+            result = self.__cursor.fetchone()
+            if result:
+                return result
+            else:
+                return f"Patient with the given username and password couldn't be found"
+        except sqlite3.Error as err:
+            return f"An error occurred: {err}"
+
     def get_doctor_info(self, patient_first_name: str, patient_last_name: str):
         # Get the doctor's ID from the Patient table
         query = f"""
@@ -231,12 +246,12 @@ class Database:
 
     def get_patient_medications(self, first_name: str, last_name:str):
         query = f"""
-                SELECT * FROM Medications
+                SELECT prescribed_meds, prescription_date FROM Medications
                 WHERE first_name = ? AND last_name = ?
             """
         try:
             self.__cursor.execute(query, (first_name, last_name))
-            result = self.__cursor.fetchone()
+            result = self.__cursor.fetchall()
 
             if result:
                 return result
@@ -260,21 +275,22 @@ class Database:
         except sqlite3.Error as err:
             return f"Error fetching patient health history: {err}"
 
-    def delete_medications_data(self, first_name: str, last_name: str):
+    def delete_medications_data(self, first_name: str, last_name: str, prescription_date: str, prescribed_meds:str):
         query = f"""
-            DELETE FROM Medications WHERE first_name = ? AND last_name = ?
+            DELETE FROM Medications 
+            WHERE first_name = ? AND last_name = ? AND prescription_date = ? and prescribed_meds = ?
         """
         try:
-            self.__cursor.execute(query, (first_name, last_name))
+            self.__cursor.execute(query, (first_name, last_name, prescription_date, prescribed_meds))
             # save the changes
             self.__sql_connection.commit()
 
             if self.__cursor.rowcount > 0:
-                return f"Patient data deleted successfully"
+                return f"Medication deleted successfully"
             else:
-                return f"No patient found with the given first and last name."
+                return f"No medication found with the given information."
         except sqlite3.Error as err:
-            return f"Error deleting patient data: {err}"
+            return f"Error deleting medication data: {err}"
 
     def delete_appointment_data(self, patient_first_name: str, patient_last_name: str):
         query = f"""
