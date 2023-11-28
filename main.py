@@ -151,10 +151,10 @@ def main_window():
     # Create notebook with three frames
     notebook = ttk.Notebook(main_window)
 
-    # Health Information Page
-    health_frame = tk.Frame(notebook)
-    notebook.add(health_frame, text='Health Info')
-    create_health_page(health_frame)
+    # User Information Page
+    user_info_frame = tk.Frame(notebook)
+    notebook.add(user_info_frame, text='User Info')
+    create_user_info_page(user_info_frame)
 
     # Medications Page
     medications_frame = tk.Frame(notebook)
@@ -171,21 +171,72 @@ def main_window():
     main_window.mainloop()
 
 
-def create_health_page(frame):
-    # Add widgets for health information page
-    label = tk.Label(frame, text="Enter health information:")
-    label.pack(pady=10)
+def create_user_info_page(frame):
+    if my_db.get_patient_health_history(logged_in_user_first_name, logged_in_user_last_name) == "No patient with the given first and last names":
+        user_info_page_for_users_with_no_info(frame)
+    else:
+        user_info_page_for_users_with_info(frame)
 
-    # TODO - Add health information of the user and other stuff
+def user_info_page_for_users_with_no_info(frame):
+    # Variables to store user input
+    weight_var = tk.StringVar()
+    height_var = tk.StringVar()
+    age_var = tk.StringVar()
+    dob_var = tk.StringVar()
 
+    def update_user_info():
+        weight = weight_var.get()
+        height = height_var.get()
+        age = age_var.get()
+        dob = dob_var.get()
+
+        # Store user's health information in the database
+        my_db.insert_into_health_history(logged_in_user_first_name, logged_in_user_last_name, weight, height, age, dob)
+        # Now that we have user's info, update the page
+        user_info_page_for_users_with_info(frame)
+
+    tk.Label(frame, text="Our records show that you have not\nadded your health information to the tracker.", font=("Arial 18 bold")).pack(pady=30)
+
+    tk.Label(frame, text="Weight (kg):").pack()
+    tk.Entry(frame, textvariable=weight_var).pack()
+
+    tk.Label(frame, text="Height (cm):").pack()
+    tk.Entry(frame, textvariable=height_var).pack()
+
+    tk.Label(frame, text="Age:").pack()
+    tk.Entry(frame, textvariable=age_var).pack()
+
+    tk.Label(frame, text="Date of Birth (mm/dd/yyyy):").pack()
+    tk.Entry(frame, textvariable=dob_var).pack()
+
+    tk.Button(frame, text="Update Health Information", command=update_user_info).pack(pady=30)
+
+def user_info_page_for_users_with_info(frame):
+    # Destroy all widgets in the frame - if any
+    for widget in frame.winfo_children():
+        widget.destroy()
+
+    user_info = my_db.get_patient_health_history(logged_in_user_first_name, logged_in_user_last_name)
+    weight = user_info[2]
+    height = user_info[3]
+    age = user_info[4]
+    dob = user_info[5]
+
+    tk.Label(frame, text="\nYour Information:", font=("Arial 16 bold")).pack(pady=20)
+    tk.Label(frame, text="\nFirst name: " + logged_in_user_first_name).pack()
+    tk.Label(frame, text="Last name: " + logged_in_user_last_name).pack()
+    tk.Label(frame, text="E-mail: " + logged_in_user_email).pack()
+    tk.Label(frame, text="Username: " + logged_in_user_username).pack()
+    tk.Label(frame, text="\nWeight (kg): " + weight).pack()
+    tk.Label(frame, text="Height (cm): " + height).pack()
+    tk.Label(frame, text="Age: " + age).pack()
+    tk.Label(frame, text="Date of Birth (mm/dd/yyyy): " + dob).pack()
 
 def create_medications_page(frame):
     # Add widgets for medications page
-    label = tk.Label(frame, text="Track your medications and set reminders:")
+    label = tk.Label(frame, text="Track your medications:", font=("Arial 18 bold"))
     label.pack(pady=10)
 
-    # TODO - store sql table of medications in data list to open with tksheet
-    # now data is only for demonstration purposes
     data = my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)
 
     # adding the medications sheet to the frame
@@ -199,10 +250,10 @@ def create_medications_page(frame):
     def delete_selected_medication_row():
         selected_cell = medications_sheet.get_currently_selected()
         selected_row = selected_cell.row
-        print(selected_row)
         my_db.delete_medications_data(logged_in_user_first_name, logged_in_user_last_name, data[selected_row][1], data[selected_row][0])
         del data[selected_row]
-        medications_sheet.set_sheet_data(data)
+        medications_sheet.select_cell(0, 0)
+        medications_sheet.delete_row(idx=selected_row)
         medications_sheet.refresh()
 
     def add_new_medication_window():
@@ -240,7 +291,6 @@ def create_medications_page(frame):
     delete_button = tk.Button(frame, text="Delete Selected Row", fg="red", command=delete_selected_medication_row)
     delete_button.pack(side=BOTTOM)
 
-    # TODO - add functionality to add_medication_button
     add_medication_button = tk.Button(frame, text="Add new medication", command=add_new_medication_window)
     add_medication_button.pack(side=BOTTOM)
 
