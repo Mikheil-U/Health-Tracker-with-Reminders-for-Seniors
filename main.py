@@ -238,7 +238,7 @@ def create_medications_page(frame):
     label.pack(pady=10)
 
     if type(my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)) == str:
-        date = set()
+        data = set()
     else:
         data = my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)
 
