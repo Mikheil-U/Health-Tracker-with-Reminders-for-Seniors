@@ -4,7 +4,6 @@ from tkinter import *
 from tkinter import messagebox
 from tksheet import Sheet
 from database.database_main import Database
-from database.db_columns import *
 import threading
 import reminders
 
@@ -14,29 +13,13 @@ logged_in_user_email = ""
 logged_in_user_first_name = ""
 logged_in_user_last_name = ""
 
-# Stop events
+# Thread declarations ands top events for the threads, which are initialized inside login_window() function
+appointments_thread = None
+medications_thread = None
 appointments_stop_event = threading.Event()
 medications_stop_event = threading.Event()
 
-# Create a thread for checking appointments
-appointments_thread = threading.Thread(target=reminders.check_appointments, args=(appointments_stop_event,))
-# Create a thread for checking medications
-medications_thread = threading.Thread(target=reminders.check_medications, args=(medications_stop_event,))
-appointments_thread.start()
-medications_thread.start()
-
-
-db_cols = DatabaseColumns()
 my_db = Database()
-
-# my_db.read_table_data('Patient')
-
-"""A helper function to initialize Database and create all tables"""
-# print(my_db.create_table('Doctor', db_cols.get_doctor_columns()))
-# print(my_db.create_table('Patient', db_cols.get_patient_columns()))
-# print(my_db.create_table('Appointment', db_cols.get_appointment_columns()))
-# print(my_db.create_table('Medications', db_cols.get_medications_columns()))
-# print(my_db.create_table('Health_History', db_cols.get_health_info_columns()))
 
 # main application window - hidden
 root = tk.Tk()
@@ -61,20 +44,32 @@ def login_window():
 
     # Function to handle login button click
     def login():
-        # TODO - update the login requirements
+        # Log in to the account using a username and a password
         username = username_var.get()
         password = password_var.get()
 
-        # TODO - login
         # Check if the username and password match
         get_login_details = my_db.authenticate(username, password)
         if username in get_login_details and password in get_login_details:
             global logged_in_user_username, logged_in_user_email, logged_in_user_first_name, logged_in_user_last_name
+            global appointments_stop_event, medications_stop_event, appointments_thread, medications_thread
+
             logged_in_user_username = username
             user_info = my_db.get_patient_details(username, password)
             logged_in_user_email = user_info[0]
             logged_in_user_first_name = user_info[1]
             logged_in_user_last_name = user_info[2]
+
+            # Initialize a thread for checking appointments
+            appointments_thread = threading.Thread(target=reminders.check_appointments,
+                                                   args=(appointments_stop_event, logged_in_user_email, logged_in_user_first_name, logged_in_user_last_name,))
+            # Initialize a thread for checking medications
+            medications_thread = threading.Thread(target=reminders.check_medications,
+                                                  args=(medications_stop_event, logged_in_user_email, logged_in_user_first_name, logged_in_user_last_name,))
+            appointments_thread.start()
+            medications_thread.start()
+
+            # Once logged in, close the login window and open the main window
             login_window.destroy()
             main_window()
             return
