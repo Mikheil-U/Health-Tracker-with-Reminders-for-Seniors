@@ -42,9 +42,11 @@ my_db = Database()
 root = tk.Tk()
 root.withdraw()
 
+
 # If the user closes the program window, the program execution stops
 def on_window_close():
     root.destroy()
+
 
 # Function to handle login window
 def login_window():
@@ -177,6 +179,7 @@ def create_user_info_page(frame):
     else:
         user_info_page_for_users_with_info(frame)
 
+
 def user_info_page_for_users_with_no_info(frame):
     # Variables to store user input
     weight_var = tk.StringVar()
@@ -211,6 +214,7 @@ def user_info_page_for_users_with_no_info(frame):
 
     tk.Button(frame, text="Update Health Information", command=update_user_info).pack(pady=30)
 
+
 def user_info_page_for_users_with_info(frame):
     # Destroy all widgets in the frame - if any
     for widget in frame.winfo_children():
@@ -232,12 +236,16 @@ def user_info_page_for_users_with_info(frame):
     tk.Label(frame, text="Age: " + age).pack()
     tk.Label(frame, text="Date of Birth (mm/dd/yyyy): " + dob).pack()
 
+
 def create_medications_page(frame):
     # Add widgets for medications page
     label = tk.Label(frame, text="Track your medications:", font=("Arial 18 bold"))
     label.pack(pady=10)
 
-    data = my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)
+    if type(my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)) == str:
+        date = set()
+    else:
+        data = my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)
 
     # adding the medications sheet to the frame
     medications_sheet = Sheet(frame)
@@ -294,12 +302,82 @@ def create_medications_page(frame):
     add_medication_button = tk.Button(frame, text="Add new medication", command=add_new_medication_window)
     add_medication_button.pack(side=BOTTOM)
 
+
 def create_appointments_page(frame):
     # Add widgets for appointments page
-    label = tk.Label(frame, text="Manage your doctor appointments:")
-    label.pack()
+    label = tk.Label(frame, text="Track your doctor appointments:", font=("Arial 18 bold"))
+    label.pack(pady=10)
 
-    # TODO - copy-paste and adjust whatever we have in create_medications_page
+    if type(my_db.get_patient_appointments(logged_in_user_first_name, logged_in_user_last_name)) == str:
+        data = set()
+    else:
+        data = my_db.get_patient_appointments(logged_in_user_first_name, logged_in_user_last_name)
+
+    # adding the appointments sheet to the frame
+    appointments_sheet = Sheet(frame)
+    appointments_sheet.set_sheet_data(data)
+    appointments_sheet.headers(["Doctor's First Name", "Doctor's Last Name", "Appointment Date", "Appointment Time"])
+    appointments_sheet.enable_bindings(("single_select"))
+    appointments_sheet.place(x=25, y=50, width=700, height=300)
+    appointments_sheet.set_options(auto_resize_columns=True)
+
+    def delete_selected_appointment_row():
+        selected_cell = appointments_sheet.get_currently_selected()
+        selected_row = selected_cell.row
+        my_db.delete_appointment_data(logged_in_user_first_name, logged_in_user_last_name, data[selected_row][2],
+                                      data[selected_row][3])
+        del data[selected_row]
+        appointments_sheet.select_cell(0, 0)
+        appointments_sheet.delete_row(idx=selected_row)
+        appointments_sheet.refresh()
+
+    def add_new_appointment_window():
+        add_appointment_window = tk.Toplevel(root)
+        add_appointment_window.title("Add New Appointment")
+        add_appointment_window.geometry("380x150")
+
+        doctor_first_name_var = tk.StringVar()
+        doctor_last_name_var = tk.StringVar()
+        appointment_date_var = tk.StringVar()
+        appointment_time_var = tk.StringVar()
+
+        def add_appointment():
+            doctor_first_name = doctor_first_name_var.get()
+            doctor_last_name = doctor_last_name_var.get()
+            appointment_date = appointment_date_var.get()
+            appointment_time = appointment_time_var.get()
+
+            my_db.create_appointment(logged_in_user_first_name, logged_in_user_last_name, appointment_date,
+                                          appointment_time, doctor_first_name, doctor_last_name)
+
+            data.append((doctor_first_name, doctor_last_name, appointment_date, appointment_time))
+            appointments_sheet.set_sheet_data(data)
+            appointments_sheet.refresh()
+            add_appointment_window.destroy()
+
+            messagebox.showinfo("Add New Appointment", "New appointment added successfully")
+
+        # Labels and Entries
+        tk.Label(add_appointment_window, text="Doctor's First Name:").grid(row=0, column=0, sticky=tk.E)
+        tk.Entry(add_appointment_window, textvariable=doctor_first_name_var).grid(row=0, column=1)
+
+        tk.Label(add_appointment_window, text="Doctor's Last Name:").grid(row=1, column=0, sticky=tk.E)
+        tk.Entry(add_appointment_window, textvariable=doctor_last_name_var).grid(row=1, column=1)
+
+        tk.Label(add_appointment_window, text="Appointment Date (mm/dd/yyyy):").grid(row=2, column=0, sticky=tk.E)
+        tk.Entry(add_appointment_window, textvariable=appointment_date_var).grid(row=2, column=1)
+
+        tk.Label(add_appointment_window, text="Appointment Time (hh:mm):").grid(row=3, column=0, sticky=tk.E)
+        tk.Entry(add_appointment_window, textvariable=appointment_time_var).grid(row=3, column=1)
+
+        tk.Button(add_appointment_window, text="Add", command=add_appointment).grid(row=4, column=0, columnspan=2)
+
+    # Create a button to delete the selected row
+    delete_button = tk.Button(frame, text="Delete Selected Row", fg="red", command=delete_selected_appointment_row)
+    delete_button.pack(side=BOTTOM)
+
+    add_medication_button = tk.Button(frame, text="Add new appointment", command=add_new_appointment_window)
+    add_medication_button.pack(side=BOTTOM)
 
 
 # Open the login window to start the program

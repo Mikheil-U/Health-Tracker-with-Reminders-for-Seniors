@@ -227,20 +227,20 @@ class Database:
         except sqlite3.Error as err:
             return f"An error occurred finding doctor's data: {err}"
 
-    def get_patient_appointment(self, patient_first_name: str, patient_last_name: str):
+    def get_patient_appointments(self, patient_first_name: str, patient_last_name: str):
 
         query = f"""
-                        SELECT * FROM Appointment
+                        SELECT doctor_first_name, doctor_last_name, app_date, app_time FROM Appointment
                         WHERE patient_first_name = ? AND patient_last_name = ?
                     """
         try:
             self.__cursor.execute(query, (patient_first_name, patient_last_name))
-            result = self.__cursor.fetchone()
+            result = self.__cursor.fetchall()
 
             if result:
-                return result[2:]
+                return result
             else:
-                return f"Patient was not found!"
+                return f"No appointmentsfound!"
         except sqlite3.Error as err:
             return f"An error occurred finding patient's appointment data: {err}"
 
@@ -292,21 +292,22 @@ class Database:
         except sqlite3.Error as err:
             return f"Error deleting medication data: {err}"
 
-    def delete_appointment_data(self, patient_first_name: str, patient_last_name: str):
+    def delete_appointment_data(self, patient_first_name: str, patient_last_name: str, app_date: str, app_time: str):
         query = f"""
-                    DELETE FROM Appointment WHERE patient_first_name = ? AND patient_last_name = ?
+                    DELETE FROM Appointment 
+                    WHERE patient_first_name = ? AND patient_last_name = ? AND app_date = ? AND app_time = ?
                 """
         try:
-            self.__cursor.execute(query, (patient_first_name, patient_last_name))
+            self.__cursor.execute(query, (patient_first_name, patient_last_name, app_date, app_time))
             # save the changes
             self.__sql_connection.commit()
 
             if self.__cursor.rowcount > 0:
                 return f"Appointment data deleted successfully"
             else:
-                return f"No patient found with the given first and last name."
+                return f"No appointment found with the information."
         except sqlite3.Error as err:
-            return f"Error deleting patient appointment data: {err}"
+            return f"Error deleting appointment data: {err}"
 
     def register_user(self, username: str, password: str):
         query = "INSERT INTO Patient(user_name, password) VALUES (?, ?)"
