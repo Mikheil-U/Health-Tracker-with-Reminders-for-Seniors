@@ -24,6 +24,12 @@ The Health Tracker with Reminders for Seniors can hold immense significance in e
 ## **Structure of the Code**
 
 ## **Functionalities and Test Results**
+### **Signing up**
+### **Logging in to your account**
+### **User Information**
+### **Medications**
+### **Doctor Appointments**
+### **Reminders**
 
 ## **Discussion and Conclusions**
 
