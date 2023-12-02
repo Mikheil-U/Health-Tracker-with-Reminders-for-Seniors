@@ -329,6 +329,8 @@ class Database:
             # check if any record was found
             if result:
                 return result[3:5]
+            else:
+                return []
         except sqlite3.Error as err:
             return ['Error occurred', err]
 
