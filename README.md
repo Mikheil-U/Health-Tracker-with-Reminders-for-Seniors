@@ -112,13 +112,13 @@ After the appointment is selected, you can just press the `Delete Selected Row` 
 <img width="801" alt="Screenshot 2023-12-02 at 5 31 27 PM" src="https://github.com/Mikheil-U/Health-Tracker-with-Reminders-for-Seniors/assets/111999712/9b513ad9-fe10-4cae-ab92-126fce59d6d1">
 
 ### **Reminders**
-One of the main goals of the project was to create a reminder system to help seniors with the memory loss that might come with age, in many cases. The reminders system works in the background, and in practice, it's a very simple process.
+One of the main goals of the project was to create a reminder system to help seniors with the memory loss that might come with age. The reminders system works in the background, and in practice, it's a very simple process.
 * When the user first logs in to their account, the program takes the user's information, such as their username, email, etc., and initializes two threads, one dedicated to medications and another one to appointments. The newly initialized threads call `check_medications` and `check_appointments` functions from `reminders.py`, and the program passes the user's information to the function.
 * Both of the functions, `check_medications` and `check_appointments` run continuously during the program run. Their main task is to check their respective databases, and if there are any upcoming medications or appointments (medications within 30 minutes; appointments within 60 minutes), send email reminders to the users.
-* Beforehand, we've set up a dedicated email address `healthtrackerforseniors@gmail.com` with app access to use in our program to send email reminders to users.
-* We use the SMTP library [2] to connect to the Gmail server, log in to our account, and send emails to the users.
+* Beforehand, we've set up a dedicated email address `healthtrackerforseniors@gmail.com` with app access to use in our program to send email reminders.
+* We use the SMTP library [2] to connect to the Gmail server, log in to our account, and send emails.
 
-This is what the email reminder currently looks like. In the case of a medication, it includes the medication name, as well as the scheduled time, and for an appointment, it includes the doctor's name, as well as the appointment date and time.
+This is what an email reminder currently looks like. In the case of a medication reminder, it includes the medication name, as well as the scheduled time, and for an appointment, it includes the doctor's name, as well as the appointment date and time.
 
 ![IMG_1967](https://github.com/Mikheil-U/Health-Tracker-with-Reminders-for-Seniors/assets/111999712/d319d3f5-03d0-4ae8-88c4-e05fdd0ba821)
 
