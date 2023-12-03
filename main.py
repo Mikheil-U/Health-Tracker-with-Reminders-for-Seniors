@@ -8,17 +8,19 @@ import threading
 import reminders
 
 
+# Variables to store the logged-in user's details
 logged_in_user_username = ""
 logged_in_user_email = ""
 logged_in_user_first_name = ""
 logged_in_user_last_name = ""
 
-# Thread declarations ands top events for the threads, which are initialized inside login_window() function
+# Thread declarations ands stop events for the threads, which are initialized inside login_window() function
 appointments_thread = None
 medications_thread = None
 appointments_stop_event = threading.Event()
 medications_stop_event = threading.Event()
 
+# Initializing the database from database_main.py
 my_db = Database()
 
 # main application window - hidden
@@ -54,6 +56,7 @@ def login_window():
             global logged_in_user_username, logged_in_user_email, logged_in_user_first_name, logged_in_user_last_name
             global appointments_stop_event, medications_stop_event, appointments_thread, medications_thread
 
+            # Store the logged-in user's information in the above-mentioned variables
             logged_in_user_username = username
             user_info = my_db.get_patient_details(username, password)
             logged_in_user_email = user_info[0]
@@ -66,6 +69,7 @@ def login_window():
             # Initialize a thread for checking medications
             medications_thread = threading.Thread(target=reminders.check_medications,
                                                   args=(medications_stop_event, logged_in_user_email, logged_in_user_first_name, logged_in_user_last_name,))
+            # Start the trheads
             appointments_thread.start()
             medications_thread.start()
 
@@ -111,12 +115,14 @@ def signup_window():
         first_name = first_name_var.get()
         last_name = last_name_var.get()
 
+        # Add user's credentials to the database
         my_db.register_user(username, password)
         my_db.update_patient_data(username, first_name, last_name, email)
 
         # Close sign-up window
         signup_window.destroy()
 
+        # Upon a successful registration, display a message
         messagebox.showinfo("Sign Up", "Singing up successful")
 
     # Labels and Entries
@@ -168,13 +174,16 @@ def main_window():
     main_window.mainloop()
 
 
+# Function to handle the user info page
 def create_user_info_page(frame):
+    # Check if there's information about the user in the database, and call methods accordingly
     if my_db.get_patient_health_history(logged_in_user_first_name, logged_in_user_last_name) == "No patient with the given first and last names":
         user_info_page_for_users_with_no_info(frame)
     else:
         user_info_page_for_users_with_info(frame)
 
 
+# Function to handle the user info page for users with no information in the database
 def user_info_page_for_users_with_no_info(frame):
     # Variables to store user input
     weight_var = tk.StringVar()
@@ -182,6 +191,7 @@ def user_info_page_for_users_with_no_info(frame):
     age_var = tk.StringVar()
     dob_var = tk.StringVar()
 
+    # Function to handle storing the user info in the database
     def update_user_info():
         weight = weight_var.get()
         height = height_var.get()
@@ -210,17 +220,20 @@ def user_info_page_for_users_with_no_info(frame):
     tk.Button(frame, text="Update Health Information", command=update_user_info).pack(pady=30)
 
 
+# Function to handle the user info page for users with existing info in the database
 def user_info_page_for_users_with_info(frame):
-    # Destroy all widgets in the frame - if any
+    # Destroy all widgets in the frame - if any - to update the page
     for widget in frame.winfo_children():
         widget.destroy()
 
+    # Get user info from the database and parse it
     user_info = my_db.get_patient_health_history(logged_in_user_first_name, logged_in_user_last_name)
     weight = user_info[2]
     height = user_info[3]
     age = user_info[4]
     dob = user_info[5]
 
+    # Print out user info in the 'User Info' frame
     tk.Label(frame, text="\nYour Information:", font=("Arial 16 bold")).pack(pady=20)
     tk.Label(frame, text="\nFirst name: " + logged_in_user_first_name).pack()
     tk.Label(frame, text="Last name: " + logged_in_user_last_name).pack()
@@ -232,11 +245,13 @@ def user_info_page_for_users_with_info(frame):
     tk.Label(frame, text="Date of Birth (mm/dd/yyyy): " + dob).pack()
 
 
+# Function to handle the creation of the medications page
 def create_medications_page(frame):
     # Add widgets for medications page
     label = tk.Label(frame, text="Track your medications:", font=("Arial 18 bold"))
     label.pack(pady=10)
 
+    # If there are any medications in the database, get them; if not, create an empty list
     if type(my_db.get_patient_medications(logged_in_user_first_name, logged_in_user_last_name)) == str:
         data = []
     else:
@@ -250,15 +265,19 @@ def create_medications_page(frame):
     medications_sheet.place(x=25, y=50, width=700, height=300)
     medications_sheet.set_options(auto_resize_columns=True)
 
+    # Function to handle deletion of medications
     def delete_selected_medication_row():
         selected_cell = medications_sheet.get_currently_selected()
         selected_row = selected_cell.row
         my_db.delete_medications_data(logged_in_user_first_name, logged_in_user_last_name, data[selected_row][1], data[selected_row][0])
         del data[selected_row]
+
+        # Update the medications sheet after deletion
         medications_sheet.select_cell(0, 0)
         medications_sheet.delete_row(idx=selected_row)
         medications_sheet.refresh()
 
+    # Function to handle the creation of the add-new-medication window
     def add_new_medication_window():
         add_medication_window = tk.Toplevel(root)
         add_medication_window.title("Add New Medication")
@@ -267,6 +286,7 @@ def create_medications_page(frame):
         medication_name_var = tk.StringVar()
         medication_time_var = tk.StringVar()
 
+        # Function to add new medication to the database
         def add_medication():
             medication_name = medication_name_var.get()
             medication_time = medication_time_var.get()
@@ -275,10 +295,13 @@ def create_medications_page(frame):
                                           medication_name)
 
             data.append((medication_name, medication_time))
+
+            # Update the medications sheet
             medications_sheet.set_sheet_data(data)
             medications_sheet.refresh()
             add_medication_window.destroy()
 
+            # Display a message
             messagebox.showinfo("Add New Medication", "New medication added successfully")
 
         # Labels and Entries
@@ -298,11 +321,13 @@ def create_medications_page(frame):
     add_medication_button.pack(side=BOTTOM)
 
 
+# Function to handle the creation of an appointments page
 def create_appointments_page(frame):
     # Add widgets for appointments page
     label = tk.Label(frame, text="Track your doctor appointments:", font=("Arial 18 bold"))
     label.pack(pady=10)
 
+    # If there are any appointments in the database, get them; if not, create an empty list
     if type(my_db.get_patient_appointments(logged_in_user_first_name, logged_in_user_last_name)) == str:
         data = []
     else:
@@ -322,10 +347,13 @@ def create_appointments_page(frame):
         my_db.delete_appointment_data(logged_in_user_first_name, logged_in_user_last_name, data[selected_row][2],
                                       data[selected_row][3])
         del data[selected_row]
+
+        # Update the appointments sheet
         appointments_sheet.select_cell(0, 0)
         appointments_sheet.delete_row(idx=selected_row)
         appointments_sheet.refresh()
 
+    # Function to handle the creation of the add-new-appointment window
     def add_new_appointment_window():
         add_appointment_window = tk.Toplevel(root)
         add_appointment_window.title("Add New Appointment")
@@ -336,6 +364,7 @@ def create_appointments_page(frame):
         appointment_date_var = tk.StringVar()
         appointment_time_var = tk.StringVar()
 
+        # Function to add a new appointment to the database
         def add_appointment():
             doctor_first_name = doctor_first_name_var.get()
             doctor_last_name = doctor_last_name_var.get()
@@ -346,10 +375,13 @@ def create_appointments_page(frame):
                                           appointment_time, doctor_first_name, doctor_last_name)
 
             data.append((doctor_first_name, doctor_last_name, appointment_date, appointment_time))
+
+            # Update the appointments sheet
             appointments_sheet.set_sheet_data(data)
             appointments_sheet.refresh()
             add_appointment_window.destroy()
 
+            # Display a message
             messagebox.showinfo("Add New Appointment", "New appointment added successfully")
 
         # Labels and Entries
@@ -380,9 +412,10 @@ login_window()
 
 root.mainloop()
 
-# To stop the threads
+# To stop the threads, set stop events
 appointments_stop_event.set()
 medications_stop_event.set()
 
+# Terminate the threads
 appointments_thread.join()
 medications_thread.join()

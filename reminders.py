@@ -6,20 +6,25 @@ from database.database_main import Database
 
 # DOCTOR APPOINTMENTS
 
+# To see if a reminder was sent already or not
 sent_appointment_reminders = set()
 
 # Check the database for upcoming appointments and send a reminder
 def check_appointments(stop_event, email, first_name, last_name):
     my_db = Database()
 
+    # While the stop event is not set from main.py
     while not stop_event.is_set():
+        # If there are any appointments in the database, get them; if not, create an empty set
         if type(my_db.get_patient_appointments(first_name, last_name)) == str:
             appointments = set()
         else:
             appointments = my_db.get_patient_appointments(first_name, last_name)
 
+        # Get the current time
         current_time = datetime.now()
 
+        # Check all the appointments of the user
         for appointment in appointments:
             appointment_date_list = appointment[2].split('/')
             appointment_date = appointment_date_list[2] + "-" + appointment_date_list[0] + "-" + appointment_date_list[1]
@@ -34,7 +39,7 @@ def check_appointments(stop_event, email, first_name, last_name):
                 sent_appointment_reminders.add(appointment_id)
 
         # Sleep for some time before checking again
-        time.sleep(1)  # Sleep for 1 minute
+        time.sleep(5)  # Sleep for 5 seconds
 
 
 # Function that sends a reminder for an upcoming appointment
@@ -47,20 +52,25 @@ def send_appointment_reminder(recipient_email, doctor, appointment_time):
 # ----------------------------------------------------------------------------------------------------------------------
 # MEDICATIONS
 
+# To see if a reminder was sent already or not
 sent_medication_reminders = set()
 
 # Check the database for upcoming medications and send a reminder
 def check_medications(stop_event, email, first_name, last_name):
     my_db = Database()
 
+    # While the stop event is not set from main.py
     while not stop_event.is_set():
+        # If there are any medications in the database, get them; if not, create an empty set
         if type(my_db.get_patient_medications(first_name, last_name)) == str:
             medications = set()
         else:
             medications = my_db.get_patient_medications(first_name, last_name)
 
+        # Get the current time
         current_time = datetime.now()
 
+        # Check all the medications of the user
         for medication in medications:
             medication_date_and_time = str(date.today()) + " " + medication[1] + ":00"
             medication_time = datetime.strptime(medication_date_and_time, "%Y-%m-%d %H:%M:%S")
@@ -73,7 +83,7 @@ def check_medications(stop_event, email, first_name, last_name):
                 sent_medication_reminders.add(medication_id)
 
         # Sleep for some time before checking again
-        time.sleep(1)  # Sleep for 1 minute
+        time.sleep(5)  # Sleep for 5 seconds
 
 
 # Function that sends a reminder for an upcoming appointment
