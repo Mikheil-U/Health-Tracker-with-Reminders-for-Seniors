@@ -125,8 +125,23 @@ This is what an email reminder currently looks like. In the case of a medication
 ![IMG_1969](https://github.com/Mikheil-U/Health-Tracker-with-Reminders-for-Seniors/assets/111999712/8c71f77f-ef16-4ae8-bdc9-a3f84d374a7f)
 
 ## **Discussion and Conclusions**
+### Issues and Limitations
+There are not any significant issues related to how the program works currently, but considering the timeframe and the scope of the project, there were some limitations, and with more time, the functionalities of the Health Tracker could be expanded greatly. One of the main limiting factors was the use of Tkinter as our GUI library of choice. Even though Tkinter has many functionalities (we probably didn't even use half of them in this project), it can be very challenging to use, and if we were to expand the capabilities of the project, we think it would be best to switch to a web-based application, which would give us more control on how things work, as well as on how things look. In several instances, we had to work with the Tksheet library, which was not the easiest to use or understand either.
+
+If we had more time, we would probably work further on the Health Tracker's premise to be the only place where senior users go to learn more about health-related things. We had some ideas, but since we were limited in the timeframe, and since this is a project for a college course, most of these ideas seemed impossible to implement. For example, it would be great if users could store more health information in the program, such as their health issues, blood rate, laboratory results, etc., or if they could upload their records directly to the program. 
+
+When it comes to reminders, currently, the program only sends them to the user's email. It would be smart if it also sent them to user's phone numbers as text messages. But this feature would only be justified to implement if we were planning to release the program to the masses, since otherwise we would have to get a new phone number, and account for data rates, etc. 
+
+### Application of Course Learnings
+Multithreading is one of the most important topics that we've learned in this course. When we were working on the project, we had multiple ideas, but in the process, we discovered that we had to use some form of multithreading, otherwise, the program would not work. Currently, the program continuously checks the databases for upcoming medications or doctor appointments, so we employed two separate threads - one concerned with checking medications and sending medication-related reminders, and another one concerned with checking appointments and sending appointment-related reminders. So that way, these processes run in the background and we can focus on the user interface of the program.
+
+We implemented the two threads using Python's built-in `threading` library. When the user logs in to their account that's when the threads are started, and the user's credentials are passed to the threads as arguments. We also used `theading.Event()`-s as stop events. After the main program is done executing (when the user closes it), we set the stop events, and that's when the threads are terminated.
+
+### Conclusion
+In conclusion, the Health Tracker with Reminders for Seniors was one of the most interesting projects that we have worked on so far. Even though, as of now, its capabilities are limited, it can have huge potential in the future if implemented correctly. We learned so much during our time working on the project - including how to use Tkinter effectively, how to implement SQL databases, how to use multithreading for the benefit of the whole program, etc. We believe it could be a very useful tool for every senior in tracking their health-related activities, and there's nothing more important than the health of a person.
 
 ## **References**
 1. https://www.nia.nih.gov/health/memory-loss-and-forgetfulness/memory-problems-forgetfulness-and-aging
 2. https://docs.python.org/3/library/smtplib.html
-3. 
+3. https://docs.python.org/3/library/tk.html
+4. https://github.com/ragardner/tksheet/blob/master/DOCUMENTATION.md
