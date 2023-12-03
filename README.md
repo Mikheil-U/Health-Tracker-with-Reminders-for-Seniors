@@ -20,7 +20,19 @@ The Health Tracker with Reminders for Seniors can hold immense significance in e
 * And finally, the Health Tracker actively promotes the independence of seniors by providing a platform that allows them to take charge of their well-being while fostering a sense of control over their health-related activities.
 
 ## **Installation and Instructions to Use**
-
+* Clone the GitHub repository on your choice of IDE: https://github.com/Mikheil-U/Health-Tracker-with-Reminders-for-Seniors.git
+* To install tkinter
+```
+pip install tk
+```
+* To use the program
+Navigate to Health-Tracker-with-Reminders-for-Seniors project.
+Open "main.py" and run the code.
+Click Sign-Up and enter your details.
+After creating an account close the Sign Up window and enter your sign up details.
+Now you will be granted to enter your details such as weight, height, age and DOB.
+Once user has entered their information now they can add medications and create appointments by navigating to
+"Medications" and "Appointments" tabs. 
 ## **Structure of the Code**
 
 ## **Functionalities and Results**
