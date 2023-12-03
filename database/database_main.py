@@ -331,22 +331,6 @@ def populate_database():
     for i in range(len(first_names)):
         print(my_db.assign_doctor(first_names[i], last_names[i], doc_names[i], doc_lnames[i]))
 
-    # Create appointments
-    # for i in range(len(first_names)):
-    #     print(my_db.create_appointment(first_names[i], last_names[i], '12-12-2023', '{}'))
 
 
 
-# create_tables()
-# print(my_db.insert_into_patient_table('mike', 'smith', 'email@mail.com', '123-444-1233'))
-# print(my_db.insert_into_doctor_table('Jessica', 'Doe', 'doejessica@mail.com', '123-444-5018'))
-# print(my_db.assign_doctor('mike', 'smith', 'Jessica', 'Doe'))
-# print(my_db.create_appointment('mike', 'smith', '11/29/2023', '4:30pm', 'Jessica', "Doe"))
-# print(my_db.get_patient_appointment('mike', 'smith'))
-# print(my_db.insert_into_medications('mike', 'smith', '11-26-2023', 'tylenol'))
-# print(my_db.insert_into_health_history('mike', 'smith', '150lbs', "5'9", '25', '1998'))
-
-# populate_database()
-# my_db.read_table_data('Patient')
-# print(my_db.delete_medications_data('mike', 'smith'))
-# print(my_db.delete_appointment_data('mike', 'smith'))
