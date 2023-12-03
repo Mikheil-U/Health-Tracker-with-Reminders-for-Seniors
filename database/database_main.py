@@ -39,46 +39,6 @@ class Database:
         except sqlite3.Error as err:
             return f"Error inserting data into Patient table: {err}"
 
-    def insert_into_doctor_table(self, first_name: str, last_name: str,
-                                 email: str, phone_no: str, ):
-        query = '''
-            INSERT INTO Doctor(first_name, last_name, email, phone_no)
-            VALUES (?, ?, ?, ?)
-        '''
-        values = (first_name, last_name, email, phone_no)
-        try:
-            self.__cursor.execute(query, values)
-            self.__sql_connection.commit()
-            return f"Data inserted into Doctor table successfully!"
-        except sqlite3.Error as err:
-            return f"Error inserting data into Doctor table: {err}"
-
-    def insert_into_appointment_table(self, description: str, doctor_id: str,
-                                      patient_id: str):
-        query = '''
-            INSERT INTO Doctor(description, doctor_id, patient_id)
-            VALUES (?, ?, ?, ?)
-        '''
-        values = (description, doctor_id, patient_id)
-        try:
-            self.__cursor.execute(query, values)
-            self.__sql_connection.commit()
-            return f"Data inserted into Appointment table successfully!"
-        except sqlite3.Error as err:
-            return f"Error inserting data into Appointment table: {err}"
-
-    def insert_into_health_history(self, first_name: str, last_name: str, weight: str, height: str, age: str, dob: str):
-        query = f"""
-            INSERT INTO Health_History(first_name, last_name, weight, height, age, dob)
-            VALUES (?, ?, ?, ?, ?, ?) 
-        """
-        try:
-            self.__cursor.execute(query, (first_name, last_name, weight, height, age, dob))
-            self.__sql_connection.commit()
-            return f"Data inserted into Health History table successfully!"
-        except sqlite3.Error as err:
-            return f"Error inserting data into Health History table: {err}"
-
     def insert_into_medications(self, first_name: str, last_name: str, prescription_date: str, prescribed_meds: str):
         query = f"""
                     INSERT INTO Medications(first_name, last_name, prescription_date, prescribed_meds)
