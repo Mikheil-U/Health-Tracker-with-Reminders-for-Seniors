@@ -35,6 +35,41 @@ pip install tk
 "Medications" and "Appointments" tabs. 
 ## **Structure of the Code**
 
+### Database Module
+* `create_table`: Creates a new table in the database.
+* `insert_into_patient_table`: Inserts new patient data.
+* `insert_into_medications`: Inserts medication data.
+* `read_table_data`: Fetches and prints data from a specified table.
+* `update_patient_data`: Updates patient information.
+* `assign_doctor`: Assigns a doctor to a patient.
+* `create_appointment`: Creates a new appointment.
+* `get_patient_email`: Retrieves email of a patient.
+* `get_patient_details`: Fetches details of a patient.
+* `get_doctor_info`: Retrieves doctor's information for a patient.
+* `get_patient_appointments`: Fetches patient's appointments.
+* `get_patient_medications`: Retrieves medications for a patient.
+* `get_patient_health_history`: Fetches patient's health history.
+* `delete_medications_data`: Deletes a medication record.
+* `delete_appointment_data`: Deletes an appointment record.
+* `register_user`: Registers a new user.
+* `authenticate`: Authenticates a user.
+### Tkinter GUI Module
+* `on_window_close`: Function to handle the closing of the window.
+* `login_window`: Function to handle the login window.
+* `signup_window`: Function to handle the sign-up window.
+* `main_window`: Function to handle the main application window.
+* `create_user_info_page`: Function to display user information.
+* `user_info_page_for_users_with_no_info`: Page for users without health information.
+* `user_info_page_for_users_with_info`: Page for users with health information.
+* `create_medications_page`: Page to manage medications.
+* `create_appointments_page`: Page to manage appointments.
+### Thread Management
+* Code to start and stop threads for appointment and medication reminders.
+### Main Execution
+* Execution of `login_window()` to start the program.
+### External Dependencies
+* Import statements for `sqlite3`, `tkinter`, `tksheet`, and other necessary libraries.
+  
 ## **Functionalities and Results**
 When you first run the program, you are greeted with a login page, which includes a welcome message, fields that accept login credentials, and buttons to log in or sign up/register a new account. 
 
