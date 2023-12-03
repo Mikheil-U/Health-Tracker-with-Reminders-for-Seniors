@@ -25,13 +25,13 @@ The Health Tracker with Reminders for Seniors can hold immense significance in e
 ```
 pip install tk
 ```
-* To use the program
-Navigate to Health-Tracker-with-Reminders-for-Seniors project.
-Open "main.py" and run the code.
-Click Sign-Up and enter your details.
-After creating an account close the Sign Up window and enter your sign up details.
-Now you will be granted to enter your details such as weight, height, age and DOB.
-Once user has entered their information now they can add medications and create appointments by navigating to
+### To use the program
+* Navigate to Health-Tracker-with-Reminders-for-Seniors project.
+* Open "main.py" and run the code.
+* Click Sign-Up and enter your details.
+* After creating an account close the Sign Up window and enter your sign up details.
+* Now you will be granted to enter your details such as weight, height, age and DOB.
+* Once user has entered their information now they can add medications and create appointments by navigating to
 "Medications" and "Appointments" tabs. 
 ## **Structure of the Code**
 
