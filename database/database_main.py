@@ -344,5 +344,8 @@ def populate_database():
         print(my_db.assign_doctor(first_names[i], last_names[i], doc_names[i], doc_lnames[i]))
 
 
+def init_db():
+    pass
+
 
 
