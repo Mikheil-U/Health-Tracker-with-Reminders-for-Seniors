@@ -417,5 +417,6 @@ appointments_stop_event.set()
 medications_stop_event.set()
 
 # Terminate the threads
-appointments_thread.join()
-medications_thread.join()
+if appointments_thread and medications_thread:
+    appointments_thread.join()
+    medications_thread.join()
