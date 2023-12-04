@@ -25,6 +25,18 @@ class Database:
         except sqlite3.Error as err:
             return f"Error creating table: {table_name}: {err}"
 
+    def insert_into_health_history(self, first_name: str, last_name: str, weight: str, height: str, age: str, dob: str):
+        query = f"""
+            INSERT INTO Health_History(first_name, last_name, weight, height, age, dob)
+            VALUES (?, ?, ?, ?, ?, ?) 
+        """
+        try:
+            self.__cursor.execute(query, (first_name, last_name, weight, height, age, dob))
+            self.__sql_connection.commit()
+            return f"Data inserted into Health History table successfully!"
+        except sqlite3.Error as err:
+            return f"Error inserting data into Health History table: {err}"
+
     def insert_into_patient_table(self, first_name: str, last_name: str,
                                   email: str, phone_no: str):
         query = '''
